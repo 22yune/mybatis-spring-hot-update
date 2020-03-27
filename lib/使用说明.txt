@@ -1,8 +1,10 @@
-1、解压缩jnotify-lib-0.94.zip。
-2、xquant_base类路径加入spring_mybatis_hot_update-0.02.jar和jnotify-0.94.jar。
-3、xir_j2ee项目的本地库地址（Native library location)加入jnotify.dll、jnotify_64bit.dll的路径（即解压缩的文件夹路径）或启动参数加上 -Djava.library.path=jnotify.dll、jnotify_64bit.dll的路径。
-4、appContext-base-db.xml中“sqlSessionFactory”bean的class由org.mybatis.spring.SqlSessionFactoryBean改为com.xQuant.base.mybatis.SqlSessionFactoryBean。bean属性加上:
+
+1、类路径加入spring_mybatis_hot_update-1.0.0.jar和jnotify-0.94.jar。
+
+2、web项目启动参数加上 -Djava.library.path=jnotify.dll、jnotify_64bit.dll所在路径。
+
+3、appContext-base-db.xml中“sqlSessionFactory”bean的class由org.mybatis.spring.SqlSessionFactoryBean改为com.xQuant.base.mybatis.SqlSessionFactoryBean。bean属性加上:
 	<property name="mapperPath" value="classpath*:sqlMapper" />
 	
-5、修改mapper文件，立即会自动更新（jar包中的mapper文件不行）。
+5、修改mapper文件，刷新web项目，立即会自动更新。
 
