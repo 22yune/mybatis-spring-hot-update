@@ -1,0 +1,125 @@
+package com.xQuant.base.mybatis;
+
+import static java.lang.reflect.Proxy.newProxyInstance;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Check every now and then that a certain file has not changed. If it has, then
+ * call the {@link #doOnChange} method.
+ */
+public abstract class FileObserver<T> extends Thread {
+
+	private Logger log = LoggerFactory.getLogger(this.getClass());
+
+	private WatchService watcher;
+	boolean interrupted = false;
+
+	protected FileObserver(List<T> resources) {
+		super("FileObserver");
+		try {
+			watcher = FileSystems.getDefault().newWatchService();
+
+			for (T resource : resources) {
+				PathResource path = (PathResource) newProxyInstance(Path.class.getClassLoader(),
+						new Class[] { PathResource.class },
+						new PathProxy().setResource(resource));
+				try {
+					path.register(watcher,
+							StandardWatchEventKinds.ENTRY_MODIFY,
+							StandardWatchEventKinds.OVERFLOW);
+				} catch (IOException e) {
+					log.error("Was not allowed to read check file existance, file:["
+							+ getName(resource) + "].");
+					e.printStackTrace();
+				}
+			}
+		} catch (IOException e1) {
+			interrupted = true;
+			e1.printStackTrace();
+		}
+		setDaemon(true);
+	}
+
+	abstract protected Path getPath(T resource);
+
+	abstract protected String getName(T resource);
+
+	abstract protected void doOnChange(T resource);
+
+	protected void checkAndConfigure() {
+
+		while (!interrupted) {
+			try {
+				// retrieve key
+				WatchKey key = watcher.take();
+
+				// process events
+				/*
+				 * for (WatchEvent event : key.pollEvents()) {
+				 * 
+				 * }
+				 */
+
+				try {
+					doOnChange(((PathResource<T>)key.watchable()).getResource());
+				} catch (Exception e) {
+					interrupted = true;
+					e.printStackTrace();
+				}
+				// reset the key
+				boolean valid = key.reset();
+				if (!valid) {
+					// object no longer registered
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+	}
+
+	public void run() {
+		checkAndConfigure();
+	}
+	
+	private interface PathResource<T> extends Path{
+		public T getResource();
+	}
+	private class PathProxy implements InvocationHandler {
+		private T resource;
+
+		@Override
+		public Object invoke(Object proxy, Method method, Object[] args)
+				throws Throwable {
+			if(method.getName().equals("getResource")){
+				return this.getResource();
+			}
+			Object result = method.invoke(getPath(this.getResource()), args);
+			return result;
+		}
+
+		public T getResource() {
+			return resource;
+		}
+
+		public PathProxy setResource(T resource) {
+			this.resource = resource;
+			return this;
+		}
+
+	}
+
+}

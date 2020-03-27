@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="com.galen.program.AppTest" time="0.029" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="sun.desktop" value="windows"/>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="java.specification.version" value="1.8"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="E:\program\spring-mybatis-hot-update\target\test-classes;E:\program\spring-mybatis-hot-update\target\classes;D:\maven\repo.xquant\net\contentobjects\jnotify\jnotify\0.94\jnotify-0.94.jar;D:\maven\repo.xquant\org\mybatis\mybatis\3.1.1\mybatis-3.1.1.jar;D:\maven\repo.xquant\org\mybatis\mybatis-spring\1.3.2\mybatis-spring-1.3.2.jar;D:\maven\repo.xquant\org\springframework\spring-context\5.0.10.RELEASE\spring-context-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-aop\5.0.10.RELEASE\spring-aop-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-beans\5.0.10.RELEASE\spring-beans-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-core\5.0.10.RELEASE\spring-core-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-jcl\5.0.10.RELEASE\spring-jcl-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-expression\5.0.10.RELEASE\spring-expression-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-jdbc\5.0.10.RELEASE\spring-jdbc-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-tx\5.0.10.RELEASE\spring-tx-5.0.10.RELEASE.jar;D:\maven\repo.xquant\junit\junit\4.11\junit-4.11.jar;D:\maven\repo.xquant\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;D:\maven\repo.xquant\org\slf4j\slf4j-api\1.7.25\slf4j-api-1.7.25.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="java.vm.specification.version" value="1.8"/>
+    <property name="os.name" value="Windows 7"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk1.8.0_65\jre\bin"/>
+    <property name="sun.java.command" value="C:\Users\ADMINI~1\AppData\Local\Temp\surefire2642942974155229634\surefirebooter4485817078789899695.jar C:\Users\Administrator\AppData\Local\Temp\surefire2642942974155229634 2020-03-27T13-10-16_502-jvmRun1 surefire2519889274061516284tmp surefire_06839175170787934323tmp"/>
+    <property name="surefire.test.class.path" value="E:\program\spring-mybatis-hot-update\target\test-classes;E:\program\spring-mybatis-hot-update\target\classes;D:\maven\repo.xquant\net\contentobjects\jnotify\jnotify\0.94\jnotify-0.94.jar;D:\maven\repo.xquant\org\mybatis\mybatis\3.1.1\mybatis-3.1.1.jar;D:\maven\repo.xquant\org\mybatis\mybatis-spring\1.3.2\mybatis-spring-1.3.2.jar;D:\maven\repo.xquant\org\springframework\spring-context\5.0.10.RELEASE\spring-context-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-aop\5.0.10.RELEASE\spring-aop-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-beans\5.0.10.RELEASE\spring-beans-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-core\5.0.10.RELEASE\spring-core-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-jcl\5.0.10.RELEASE\spring-jcl-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-expression\5.0.10.RELEASE\spring-expression-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-jdbc\5.0.10.RELEASE\spring-jdbc-5.0.10.RELEASE.jar;D:\maven\repo.xquant\org\springframework\spring-tx\5.0.10.RELEASE\spring-tx-5.0.10.RELEASE.jar;D:\maven\repo.xquant\junit\junit\4.11\junit-4.11.jar;D:\maven\repo.xquant\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;D:\maven\repo.xquant\org\slf4j\slf4j-api\1.7.25\slf4j-api-1.7.25.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\Administrator"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk1.8.0_65\jre"/>
+    <property name="basedir" value="E:\program\spring-mybatis-hot-update"/>
+    <property name="file.separator" value="\"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
+    <property name="surefire.real.class.path" value="C:\Users\ADMINI~1\AppData\Local\Temp\surefire2642942974155229634\surefirebooter4485817078789899695.jar"/>
+    <property name="sun.boot.class.path" value="C:\Program Files\Java\jdk1.8.0_65\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\rt.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\sunrsasign.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_65\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_65\jre\classes"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="1.8.0_65-b17"/>
+    <property name="user.name" value="Administrator"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="6.1"/>
+    <property name="java.endorsed.dirs" value="C:\Program Files\Java\jdk1.8.0_65\jre\lib\endorsed"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="GBK"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="D:\maven\repo.xquant"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\ADMINI~1\AppData\Local\Temp\"/>
+    <property name="idea.version" value="2018.1.2"/>
+    <property name="java.version" value="1.8.0_65"/>
+    <property name="user.dir" value="E:\program\spring-mybatis-hot-update"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="sun.os.patch.level" value="Service Pack 1"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk1.8.0_65\jre\bin;C:\windows\Sun\Java\bin;C:\windows\system32;C:\windows;C:\Ruby26-x64\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Python34\;C:\Python34\Scripts;C:\Program Files\HPE_Security\Fortify_SCA_and_Apps_17.10\bin;C:\Program Files (x86)\Common Files\NetSarang;D:\app\Administrator\product\11.2.0\client_1;C:\ProgramData\Oracle\Java\javapath;D:\app\Oracle11\product\11.2.0\dbhome_1\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Java\jdk1.8.0_65\bin;C:\Program Files\Java\jdk1.8.0_65\jre\bin;D:\Program Files\apache-maven-3.2.3\bin;C:\Common;C:\axis2c-1.6.0\bin;C:\axis2c-1.6.0\lib;C:\axis2c-1.6.0\bin\tools\wsdl2c;C:\axis2c-1.6.0\runtime;C:\axis2c-1.6.0\services\xQuantTp;C:\axis2c-1.6.0\services\xQuantPp;C:\Common;D:\Program Files\apache-ant-1.9.9\bin;C:\Program Files\nodejs\node_global\;C:\Program Files\VisualSVN Server\bin;C:\Program Files\TortoiseSVN\bin;D:\Program Files\groovy-2.4.13\bin;C:\Program Files\Git\cmd;D:\Program Files\Calibre Portable\Calibre;D:\Program Files\gradle-5.3.1\bin;D:\Program Files\sqllite;C:\Program Files\nodejs\;C:\Go\bin;C:\ProgramData\chocolatey\bin;C:\Program Files\gradle-5.6\bin;C:\Program Files\Calibre2\;C:\Python\Python37-32\Scripts\;C:\Python\Python37-32\;C:\Users\Administrator\AppData\Roaming\npm;C:\Users\Administrator\go\bin;.;;.;;.;;.;;."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="25.65-b01"/>
+    <property name="java.ext.dirs" value="C:\Program Files\Java\jdk1.8.0_65\jre\lib\ext;C:\windows\Sun\Java\lib\ext"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="52.0"/>
+  </properties>
+  <testcase name="shouldAnswerWithTrue" classname="com.galen.program.AppTest" time="0.002"/>
+</testsuite>
