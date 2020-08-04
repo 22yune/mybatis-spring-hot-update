@@ -1,0 +1,10 @@
+﻿
+1、项目类路径加入spring_mybatis_hot_update-1.0.0.jar和jnotify-0.94.jar。
+
+2、项目启动参数加上 -Djava.library.path=dir，dir目录下有文件jnotify.dll和jnotify_64bit.dll。如： D盘spring_mybatis_hot_update目录下有上述dll文件，则为-Djava.library.path="D:\spring_mybatis_hot_update"。
+
+3、Bean定义中“sqlSessionFactory”bean的class由org.mybatis.spring.SqlSessionFactoryBean改为com.xquant.platform.dev.tools.mybatis.hotup.SqlSessionFactoryBean。bean属性加上:
+	<property name="mapperPath" value="classpath*:sqlMapper" />
+
+4、修改mapper文件，刷新web项目，立即会自动更新。
+
