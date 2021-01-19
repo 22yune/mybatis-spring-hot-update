@@ -3,8 +3,14 @@
 
 2、项目启动参数加上 -Djava.library.path=dir，dir目录下有文件jnotify.dll和jnotify_64bit.dll。如： D盘spring_mybatis_hot_update目录下有上述dll文件，则为-Djava.library.path="D:\spring_mybatis_hot_update"。
 
-3、Bean定义中“sqlSessionFactory”bean的class由org.mybatis.spring.SqlSessionFactoryBean改为com.xquant.platform.dev.tools.mybatis.hotup.SqlSessionFactoryBean。bean属性加上:
-	<property name="mapperPath" value="classpath*:sqlMapper" />
+3、Bean定义中“sqlSessionFactory”bean的class由org.mybatis.spring.SqlSessionFactoryBean改为com.galen.program.mybatis.hotup.SqlSessionFactoryBean。bean属性加上:
+        <!-- 配置Mapper文件所在文件夹-->
+	        <property name="mapperPaths">
+                <list>
+                    <value>file:D:/workspace/project/*/**/src/main/resources/sqlMapper</value>
+                    <value>file:D:/workspace/project/*/**/src/main/resources/sqlMapper/*</value>
+                </list>
+            </property>
 
 4、修改mapper文件，刷新web项目，立即会自动更新。
 

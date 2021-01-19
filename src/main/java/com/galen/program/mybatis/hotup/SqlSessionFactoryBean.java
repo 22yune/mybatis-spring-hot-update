@@ -66,8 +66,8 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 
   private Resource[] mapperLocations;
 
-  private Resource[] mapperPath;
-  
+  private List<Resource[]> mapperPaths;
+
   private DataSource dataSource;
 
   private TransactionFactory transactionFactory;
@@ -93,7 +93,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
   private String typeAliasesPackage;
 
   private DatabaseIdProvider databaseIdProvider = new DefaultDatabaseIdProvider();
-  
+
   private long mapperWatchDelay = FileWatchdog.DEFAULT_DELAY;
 
   private int mapperMonitor = 2;
@@ -481,7 +481,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 			}
 		  }.start();*/
 	  }else if(mapperMonitor == 2){
-			new FileNotify(mapperPath, this.getClass().getClassLoader()) {
+			new FileNotify(mapperPaths, this.getClass().getClassLoader()) {
 				@Override
 				protected void doOnChange(String rootPath, String name) {
 				    if(isCandidate(name)){
@@ -512,7 +512,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 				}
 			}.start();
 	  }
-	    
+
   }
   private  void upMapper(Resource resource){
 	  if (resource == null || sqlSessionFactory == null) {
@@ -533,7 +533,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 		}
 		logger.debug("redo===: Parsed mapper file: '" + resource + "'");
   }
-	
+
   /**
    * {@inheritDoc}
    */
@@ -577,14 +577,13 @@ public void setMapperWatchDelay(long mapperWatchDelay) {
 	this.mapperWatchDelay = mapperWatchDelay;
 }
 
-public Resource[] getMapperPath() {
-	return mapperPath;
-}
+  public List<Resource[]> getMapperPaths() {
+    return mapperPaths;
+  }
 
-public void setMapperPath(Resource[] mapperPath) {
-	this.mapperPath = mapperPath;
-}
-
+  public void setMapperPaths(List<Resource[]> mapperPaths) {
+    this.mapperPaths = mapperPaths;
+  }
 }
 
 
