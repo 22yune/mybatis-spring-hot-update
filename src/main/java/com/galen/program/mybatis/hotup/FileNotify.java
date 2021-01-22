@@ -7,13 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Check every now and then that a certain file has not changed. If it has, then
- * call the {@link #doOnChange} method.
+ * <p><b>   文件监听  </b></p><br>
+ * <p> 两秒一次触发文件事件，两秒内的原始文件事件缓存去重    <br>
+ * <br><p>
+ *
+ * @author baogen.zhang          2021-01-22 11:21
  */
 public abstract class FileNotify extends Thread {
 
@@ -23,7 +27,7 @@ public abstract class FileNotify extends Thread {
 
 	volatile boolean interrupted = false;
 
-	private ConcurrentHashMap<Event,Boolean> eventMap = new ConcurrentHashMap<Event,Boolean>();
+	private ConcurrentHashMap<FileEvent,Boolean> eventMap = new ConcurrentHashMap<FileEvent,Boolean>();
 
 	private ClassLoader classLoader;
 
@@ -35,7 +39,20 @@ public abstract class FileNotify extends Thread {
 		setDaemon(true);
 	}
 
-	abstract protected void doOnChange(String rootPath, String name);
+	/**
+	 *  文件事件生产逻辑
+	 * @param wd
+	 * @param rootPath
+	 * @param name
+	 * @return
+	 */
+	abstract protected FileEvent product(int wd,String rootPath, String name);
+
+	/**
+	 * 文件事件消费逻辑
+	 * @param event
+	 */
+	abstract protected void consume(FileEvent event);
 
 	public void checkAndConfigure() {
 		int mask = JNotify.FILE_MODIFIED;// | JNotify.FILE_CREATED | JNotify.FILE_DELETED | JNotify.FILE_RENAMED;
@@ -48,7 +65,12 @@ public abstract class FileNotify extends Thread {
 		for (Resource[] rs : resources) {
 			for (Resource r : rs){
 				try {
-					paths.add(r.getFile().getAbsolutePath());
+					File file = r.getFile();
+					if(file.isDirectory()){
+						paths.add(file.getAbsolutePath());
+					}else {
+						paths.add(file.getParent()) ;
+					}
 				} catch (IOException e) {
 					try {
 						String path = r.getURL().getPath();
@@ -77,19 +99,21 @@ public abstract class FileNotify extends Thread {
 		checkAndConfigure();
 
 		while (!interrupted) {
-			try{
-				ClassLoader temp = Thread.currentThread().getContextClassLoader();
-				Thread.currentThread().setContextClassLoader(classLoader);
-				Iterator<Map.Entry<Event, Boolean>> iterator = eventMap.entrySet().iterator();
-				while (iterator.hasNext()){
-					Event e = iterator.next().getKey();
-					doOnChange(e.rootPath, e.name);
-					iterator.remove();
+			if(!eventMap.isEmpty()){
+				try{
+					ClassLoader temp = Thread.currentThread().getContextClassLoader();
+					Thread.currentThread().setContextClassLoader(classLoader);
+					Iterator<Map.Entry<FileEvent, Boolean>> iterator = eventMap.entrySet().iterator();
+					while (iterator.hasNext()){
+						FileEvent e = iterator.next().getKey();
+						consume(e);
+						iterator.remove();
+					}
+					Thread.currentThread().setContextClassLoader(temp);
+				}catch (Exception e) {
+					interrupted = true;
+					e.printStackTrace();
 				}
-				Thread.currentThread().setContextClassLoader(temp);
-			}catch (Exception e) {
-				interrupted = true;
-				e.printStackTrace();
 			}
 
 			try {
@@ -104,13 +128,16 @@ public abstract class FileNotify extends Thread {
 		@Override
 		public void fileRenamed(int wd, String rootPath, String oldName,
 								String newName) {
-			print("renamed " + rootPath + " : " + oldName + " -> " + newName);
+			print("renamed " + rootPath + File.separator + oldName + " -> " + newName);
 		}
 
 		@Override
 		public void fileModified(int wd, String rootPath, String name) {
-			print("modified " + rootPath + " : " + name);
-			FileNotify.this.eventMap.put(new Event(wd, rootPath, name),true);
+			print("modified " + rootPath + File.separator + name );
+			FileEvent event = product(wd, rootPath, name);
+			if( event != null){
+				FileNotify.this.eventMap.put(event,true);
+			}
 		}
 		@Override
 		public void fileDeleted(int wd, String rootPath, String name) {
@@ -125,29 +152,5 @@ public abstract class FileNotify extends Thread {
 		}
 	}
 
-	private static class Event{
-		int wd; String rootPath; String name;
-
-		public Event(int wd, String rootPath, String name) {
-			this.wd = wd;
-			this.rootPath = rootPath;
-			this.name = name;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			Event event = (Event) o;
-			return wd == event.wd &&
-					Objects.equals(rootPath, event.rootPath) &&
-					Objects.equals(name, event.name);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(wd, rootPath, name);
-		}
-	}
 
 }

@@ -30,10 +30,7 @@ import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -60,7 +57,7 @@ import static org.springframework.util.StringUtils.tokenizeToStringArray;
  */
 public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, InitializingBean,ApplicationListener<ApplicationEvent> {
 
-  private final Log logger = LogFactory.getLog(getClass());
+  private final Log logger = LogFactory.getLog(SqlSessionFactoryBean.class);
 
   private Resource configLocation;
 
@@ -98,11 +95,16 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 
   private int mapperMonitor = 2;
 
-    public void setMapperMonitor(int mapperMonitor) {
-        this.mapperMonitor = mapperMonitor;
-    }
+  /**
+   * 是否启用热更新
+   */
+  private boolean enableHotup = true;
 
-    /**
+  public void setMapperMonitor(int mapperMonitor) {
+    this.mapperMonitor = mapperMonitor;
+  }
+
+  /**
    * Sets the DatabaseIdProvider.
    *
    * @since 1.1.0
@@ -326,7 +328,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 
     if (hasLength(this.typeAliasesPackage)) {
       String[] typeAliasPackageArray = tokenizeToStringArray(this.typeAliasesPackage,
-          ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+              ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
       for (String packageToScan : typeAliasPackageArray) {
         configuration.getTypeAliasRegistry().registerAliases(packageToScan);
         if (this.logger.isDebugEnabled()) {
@@ -355,7 +357,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 
     if (hasLength(this.typeHandlersPackage)) {
       String[] typeHandlersPackageArray = tokenizeToStringArray(this.typeHandlersPackage,
-          ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+              ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
       for (String packageToScan : typeHandlersPackageArray) {
         configuration.getTypeHandlerRegistry().register(packageToScan);
         if (this.logger.isDebugEnabled()) {
@@ -410,7 +412,7 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 
         try {
           XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(mapperLocation.getInputStream(),
-              configuration, mapperLocation.toString(), configuration.getSqlFragments());
+                  configuration, mapperLocation.toString(), configuration.getSqlFragments());
           xmlMapperBuilder.parse();
         } catch (Exception e) {
           throw new NestedIOException("Failed to parse mapping resource: '" + mapperLocation + "'", e);
@@ -430,37 +432,40 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
     mapperMonitor(Arrays.asList(this.mapperLocations));
     return this.sqlSessionFactoryBuilder.build(configuration);
   }
-  protected boolean isCandidate(String name){
-      if(name.endsWith(".xml")){
-          return true;
-      }
-      return false;
+  protected boolean checkFileName(String name){
+    if(name.endsWith(".xml")){
+      return true;
+    }
+    return false;
   }
 
   protected void mapperMonitor(List<Resource> resources){
-	  if(mapperMonitor == 0){
-		  FileWatchdog<Resource> mwdog = new FileWatchdog<Resource>(resources){
-				@Override
-				protected File getFile(Resource resource) {
-					try {
-						return resource.getFile();
-					} catch (IOException e) {
-					//	e.printStackTrace();
-					}
-					return null;
-				}
-				@Override
-				protected String getName(Resource resource) {
-					return resource.getFilename();
-				}
-				@Override
-				protected void doOnChange(Resource resource) {
-					upMapper(resource);
-				}
-			  };
-		  if(mapperWatchDelay > 300) mwdog.setDelay(mapperWatchDelay);
-		  mwdog.start();
-	  }else if(mapperMonitor == 1){
+    if(!isEnableHotup())                  {
+      return;
+    }
+    if(mapperMonitor == 0){
+      FileWatchdog<Resource> mwdog = new FileWatchdog<Resource>(resources){
+        @Override
+        protected File getFile(Resource resource) {
+          try {
+            return resource.getFile();
+          } catch (IOException e) {
+            //	e.printStackTrace();
+          }
+          return null;
+        }
+        @Override
+        protected String getName(Resource resource) {
+          return resource.getFilename();
+        }
+        @Override
+        protected void doOnChange(Resource resource) {
+          upMapper(resource);
+        }
+      };
+      if(mapperWatchDelay > 300) mwdog.setDelay(mapperWatchDelay);
+      mwdog.start();
+    }else if(mapperMonitor == 1){
 		  /*new FileObserver<Resource>(resources){
 			@Override
 			protected Path getPath(Resource resource) {
@@ -480,58 +485,75 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
 				upMapper(resource);
 			}
 		  }.start();*/
-	  }else if(mapperMonitor == 2){
-			new FileNotify(mapperPaths, this.getClass().getClassLoader()) {
-				@Override
-				protected void doOnChange(String rootPath, String name) {
-				    if(isCandidate(name)){
-                        File file = new File(rootPath + File.separator + name);
-                        Resource resource = new FileSystemResource(file);
-                        upMapper(resource);
-                    }else if( name.endsWith(".jar")){
-                        try {
-                            File jarFile = new File(rootPath,name);
-                            long time = jarFile.lastModified();
-                            JarFile jf = new JarFile(jarFile);
-                            for (Enumeration<JarEntry> entries = jf.entries(); entries.hasMoreElements(); ) {
-                                JarEntry entry = entries.nextElement();
-                                String entryPath = entry.getName();
-                                logger.debug("JarEntry:" + entryPath);
-                                if (isCandidate(entryPath)) {
-                                    long fileTime = entry.getTime();
-                                    if(time - fileTime  < 60000){
-                                        String path = ResourceUtils.FILE_URL_PREFIX + jarFile.getPath() + ResourceUtils.JAR_URL_SEPARATOR + entryPath;
-                                        UrlResource resource = new UrlResource(ResourceUtils.URL_PROTOCOL_JAR, path);
-                                        upMapper(resource);
-                                    }
-                                }
-                            }
-                        } catch (IOException ex) {
-                        }
-                    }
-				}
-			}.start();
-	  }
+    }else if(mapperMonitor == 2){
+      new FileNotify(mapperPaths, this.getClass().getClassLoader()) {
+        @Override
+        protected FileEvent product(int wd, String rootPath, String name) {
+          File file = new File(rootPath + File.separator + name);
+          Date date = new Date();
+          long a = date.getTime() - file.lastModified();
+          if( a < 1000 ){
+            int i = name.indexOf(".xml");
+            if(i > 0){
+              return new FileEvent(rootPath, name.substring(0,i + 4));
+            }
+          }
+          logger.debug("FILE EVENT IGNORE! TIME:" + a + ";" + name + ";"  );
+          return null;
+        }
 
+        @Override
+        protected void consume(FileEvent event) {
+          String rootPath = event.getRootPath();
+          String name = event.getName();
+          if(checkFileName(name)){
+            File file = new File(rootPath + File.separator + name);
+            Resource resource = new FileSystemResource(file);
+            upMapper(resource);
+          }else if( name.endsWith(".jar")){
+            try {
+              File jarFile = new File(rootPath,name);
+              long time = jarFile.lastModified();
+              JarFile jf = new JarFile(jarFile);
+              for (Enumeration<JarEntry> entries = jf.entries(); entries.hasMoreElements(); ) {
+                JarEntry entry = entries.nextElement();
+                String entryPath = entry.getName();
+                logger.debug("JarEntry:" + entryPath);
+                if (checkFileName(entryPath)) {
+                  long fileTime = entry.getTime();
+                  if(time - fileTime  < 7200000){
+                    String path = ResourceUtils.FILE_URL_PREFIX + jarFile.getPath() + ResourceUtils.JAR_URL_SEPARATOR + entryPath;
+                    UrlResource resource = new UrlResource(ResourceUtils.URL_PROTOCOL_JAR, path);
+                    upMapper(resource);
+                  }
+                }
+              }
+            } catch (IOException ex) {
+            }
+          }
+        }
+      }.start();
+    }
   }
+
   private  void upMapper(Resource resource){
-	  if (resource == null || sqlSessionFactory == null) {
-			return;
-		}
-		Configuration configuration = (Configuration) sqlSessionFactory.getConfiguration();
-		Configuration.redo = true;
-		try {
-					XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(
-					resource.getInputStream(), configuration,
-					resource.toString(), configuration.getSqlFragments());
-			xmlMapperBuilder.parse();
-		} catch (Exception e) {
-			logger.error("redo===: Failed to parse mapping resource: '" + resource
-					+ "'", e);
-		} finally {
-			Configuration.redo = false;
-		}
-		logger.debug("redo===: Parsed mapper file: '" + resource + "'");
+    if (resource == null || sqlSessionFactory == null) {
+      return;
+    }
+    Configuration configuration = (Configuration) sqlSessionFactory.getConfiguration();
+    Configuration.redo = true;
+    try {
+      XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(
+              resource.getInputStream(), configuration,
+              resource.toString(), configuration.getSqlFragments());
+      xmlMapperBuilder.parse();
+    } catch (Exception e) {
+      logger.error("redo===: Failed to parse mapping resource: '" + resource
+              + "'", e);
+    } finally {
+      Configuration.redo = false;
+    }
+    logger.debug("redo===: Parsed mapper file: '" + resource + "'");
   }
 
   /**
@@ -569,13 +591,13 @@ public class SqlSessionFactoryBean implements FactoryBean<SqlSessionFactory>, In
     }
   }
 
-public long getMapperWatchDelay() {
-	return mapperWatchDelay;
-}
+  public long getMapperWatchDelay() {
+    return mapperWatchDelay;
+  }
 
-public void setMapperWatchDelay(long mapperWatchDelay) {
-	this.mapperWatchDelay = mapperWatchDelay;
-}
+  public void setMapperWatchDelay(long mapperWatchDelay) {
+    this.mapperWatchDelay = mapperWatchDelay;
+  }
 
   public List<Resource[]> getMapperPaths() {
     return mapperPaths;
@@ -583,6 +605,14 @@ public void setMapperWatchDelay(long mapperWatchDelay) {
 
   public void setMapperPaths(List<Resource[]> mapperPaths) {
     this.mapperPaths = mapperPaths;
+  }
+
+  public boolean isEnableHotup() {
+    return enableHotup;
+  }
+
+  public void setEnableHotup(boolean enableHotup) {
+    this.enableHotup = enableHotup;
   }
 }
 
